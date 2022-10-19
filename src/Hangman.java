@@ -104,7 +104,9 @@ public class Hangman {
             input = scan.nextLine();
             checkMatch(input);*/
             checkMatch(scan);
+            remainingGuesses--;
             checkGameOver(revealedChars);
+
         }
 
         boolean replay = playAgain();
