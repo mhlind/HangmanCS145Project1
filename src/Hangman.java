@@ -26,7 +26,6 @@ public class Hangman {
     public static Scanner scan = new Scanner(System.in);
 
     public static void main(String[] args) {
-
         playGame();
     }
 
@@ -100,11 +99,11 @@ public class Hangman {
         while (keepPlaying){
             //at the beginning of each cycle, it will redisplay the needed info
             refresh(revealedChars);
-            String input;
-            System.out.println("Please enter the character you wish to guess: ");
+            /*String input;
             //gets the user's guess and passes it into the checker function
             input = scan.nextLine();
-            checkMatch(input);
+            checkMatch(input);*/
+            checkMatch(scan);
             checkGameOver(revealedChars);
         }
 
@@ -197,15 +196,66 @@ public class Hangman {
         }
     }
 
+    public static void checkMatch(Scanner sc){
+        String userInput;
+
+        System.out.println("Please enter the character you would like to guess: ");
+        userInput = sc.nextLine();
+        //if the user asks to solve, it will
+        //converts the String to lowercase, just so capitalization doesn't matter
+        if(userInput.equalsIgnoreCase("solve")){
+            System.out.println("Solve the Word: ");
+            /*probably a more elegant solution exists
+             * but currently just gets a new user input and replaces solve with their guess
+             */
+            userInput = scan.next();
+            if (userInput.equals(secretWord)){
+                revealedChars = secretWord;
+            }
+        }
+        //if the user input anything other than solve, it will check the first character
+        //and the locations the user specifies to reveal parts of the word
+        else{
+            //position is a temporary variable, to check which index of our secret word to compare the user's input with
+            int position;
+            //String Builder class is mutable, allowing me to edit strings more easily
+            StringBuilder checkString = new StringBuilder(revealedChars);
+            //Asks the player to input the indices of the characters they want to check
+            System.out.println("Please enter the spaces you want to check (separated by spaces): ");
+
+            //loops through the user inputs the amount of times given by the difficulty
+            for (int i = 0; i < howManySpaces; i++){
+                //gets the positions of the String the user wants to check
+                position = getUserInputInt(scan);
+
+                //if the user checks a space that is out of bounds, it will reset to the max value
+                if (position > (secretWord.length() - 1)){
+                    position = howManySpaces -1;
+                }
+                //if the first character of your input is the same as the character at the current position
+                if (userInput.charAt(0) == secretWord.charAt(position)){
+                    //replace the dash at the current position with the correct character
+                    checkString.setCharAt(position, userInput.charAt(0));
+                }
+            }
+            //finally just sets the revealed string to be equal to our StringBuilder
+            revealedChars = checkString.toString();
+            //moves to next line
+            //otherwise when the game asks for the next character to guess, it might try and get
+            //any extra values the player may have input
+            sc.nextLine();
+        }
+    }
     /*boolean function to ask whether the player wants to keep going
     * returns true if they do, false if they don't
     */
     public static boolean playAgain (){
         System.out.println("Would you like to play again? (Y)es/(N)o");
         //gets the input and converts it to lowercase, to make checking it easier
-        char input = scan.nextLine().charAt(0);
+        char input = scan.next().charAt(0);
         input = Character.toLowerCase(input);
         if (input == 'y'){
+            scan.nextLine();
             return true;
         }
         else if (input == 'n'){
@@ -216,6 +266,7 @@ public class Hangman {
             System.out.println("Input not recognized, please try again");
             return playAgain();
         }
+
     }
 
     /*
