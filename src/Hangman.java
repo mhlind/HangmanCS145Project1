@@ -156,29 +156,32 @@ public class Hangman {
     */
     public static void checkMatch(String userInput){
 
-        int position;
-
-        //String Builder class is mutable, allowing me to edit strings more easily
-        StringBuilder checkString = new StringBuilder(revealedChars);
-
         //if the user asks to solve, it will
         //converts the String to lowercase, just so capitalization doesn't matter
-        if(userInput.toLowerCase().equals("solve")){
+        if(userInput.equalsIgnoreCase("solve")){
             System.out.println("Solve the Word: ");
             /*probably a more elegant solution exists
             * but currently just gets a new user input and replaces solve with their guess
             */
             userInput = scan.next();
-            //TODO implement the solve option
+            if (userInput.equals(secretWord)){
+                revealedChars = secretWord;
+            }
         }
+        //if the user input anything other than solve, it will check the first character
+        //and the locations the user specifies to reveal parts of the word
         else{
+            //position is a temporary variable, to check which index of our secret word to compare the user's input with
+            int position;
+            //String Builder class is mutable, allowing me to edit strings more easily
+            StringBuilder checkString = new StringBuilder(revealedChars);
             //Asks the player to input the indices of the characters they want to check
             System.out.println("Please enter the spaces you want to check (separated by spaces): ");
 
             //loops through the user inputs the amount of times given by the difficulty
             for (int i = 0; i < howManySpaces; i++){
                 //gets the positions of the String the user wants to check
-                position = scan.nextInt();
+                position = getUserInputInt(scan);
                 //if the user checks a space that is out of bounds, it will reset to the max value
                 if (position > (secretWord.length() - 1)){
                     position = howManySpaces -1;
@@ -189,9 +192,9 @@ public class Hangman {
                     checkString.setCharAt(position, userInput.charAt(0));
                 }
             }
+            //finally just sets the revealed string to be equal to our StringBuilder
+            revealedChars = checkString.toString();
         }
-        //finally just sets the revealed string to be equal to our StringBuilder
-        revealedChars = checkString.toString();
     }
 
     /*boolean function to ask whether the player wants to keep going
@@ -214,4 +217,19 @@ public class Hangman {
             return playAgain();
         }
     }
+
+    /*
+    * Used to clean user inputs of type int, asks for a new input if the player inputs a value not of type int
+    * Without this method the program will throw an error and terminate which is annoying
+    * */
+    public static int getUserInputInt (Scanner sc){
+        int i;
+        while (!sc.hasNextInt()){
+            System.out.println("Input was not of type integer please try again");
+            sc.next();
+        }
+        i = sc.nextInt();
+        return i;
+    }
+
 }
